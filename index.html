@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Ночной шепот • Анонимно</title>
+  <title>KHNEU Gossip • Анонімно</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -296,37 +296,37 @@
     <section class="card">
       <div class="badge">
         <span class="badge-dot"></span>
-        <span>100% АНОНИМНО • МОДЕРАЦИЯ</span>
+        <span>100% АНОНІМНО • МОДЕРАЦІЯ</span>
       </div>
 
       <h1>KHNEU <span>GOSSIP</span></h1>
       <p class="subtitle">
-        Оставь историю, признание или горячую сплетню с пар и коридоров. Имя и аккаунт не публикуются.
+       Поділися історією, зізнанням або пікантними плітками з пар та навчальних коридорів. Обіцяємо, все дууууже секретно
       </p>
 
-      <div class="tags-label">Выбери настроение поста</div>
+      <div class="tags-label">Обери настрій допису</div>
       <div class="tags" id="tags">
-        <button type="button" class="tag-btn active" data-tag="Сплетня">💬 Сплетня</button>
-        <button type="button" class="tag-btn" data-tag="Признание">🌙 Признание</button>
-        <button type="button" class="tag-btn" data-tag="Кринж на паре">😅 Кринж на паре</button>
-        <button type="button" class="tag-btn" data-tag="Вопрос">✨ Вопрос</button>
+        <button type="button" class="tag-btn active" data-tag="Плітка">💬 Плітка</button>
+        <button type="button" class="tag-btn" data-tag="Зізнання">🌙 Зізнання</button>
+        <button type="button" class="tag-btn" data-tag="Крінж на парі">😅 Крінж на парі</button>
+        <button type="button" class="tag-btn" data-tag="Питаннячко">✨ Питаннячко</button>
       </div>
 
       <div class="input-box">
         <textarea
           id="messageInput"
           maxlength="1200"
-          placeholder="Расскажи, что случилось сегодня..."
+          placeholder="Розкажи, що сталося сьогодні..."
         ></textarea>
         <div class="counter" id="counter">0 / 1200</div>
       </div>
 
       <div class="anon-note">
-        <span>🌸 После проверки пост уйдет в ленту от имени бота</span>
-        <strong>Без имени</strong>
+        <span>🌸 Після перевірки допис з’явиться у стрічці від імені бота</span>
+        <strong>Без ім'я</strong>
       </div>
 
-      <button type="button" class="submit-btn" id="submitBtn">Отправить анонимно</button>
+      <button type="button" class="submit-btn" id="submitBtn">Надіслати анонімно</button>
       <div class="toast" id="toast"></div>
     </section>
   </main>
@@ -386,7 +386,7 @@
     }
 
     // Выбор тега
-    let selectedTag = "Сплетня";
+    let selectedTag = "Плітка";
     const tagButtons = document.querySelectorAll(".tag-btn");
     tagButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -413,7 +413,7 @@
     submitBtn.addEventListener("click", () => {
       const text = textarea.value.trim();
       if (!text) {
-        toast.textContent = "Напиши хоть пару слов перед отправкой ✨";
+        toast.textContent = "Додай хоч кілька слів перед відправленням ✨";
         textarea.focus();
         return;
       }
@@ -429,7 +429,7 @@
         tg.close();
       } else {
         // Проверка в обычном браузере вне Telegram
-        toast.textContent = `Готово к отправке [${selectedTag}]: "${text.slice(0, 40)}${text.length > 40 ? "..." : ""}"`;
+        toast.textContent = `Готово для надсилання [${selectedTag}]: "${text.slice(0, 40)}${text.length > 40 ? "..." : ""}"`;
       }
     });
   </script>
