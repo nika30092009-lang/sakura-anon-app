@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ночной шепот • Анонимно</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-deep: #060b19;
+      --bg-mid: #0c1733;
+      --bg-glow: #162854;
+      --glass: rgba(14, 24, 52, 0.72);
+      --glass-border: rgba(255, 204, 224, 0.18);
+      --sakura: #ff9ec4;
+      --sakura-soft: #ffd6e6;
+      --gold: #f3d299;
+      --text-main: #f4f7ff;
+      --text-muted: #9fb0d6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 158, 196, 0.11), transparent 42%),
+        radial-gradient(circle at 85% 20%, rgba(114, 156, 255, 0.16), transparent 48%),
+        linear-gradient(165deg, var(--bg-deep) 0%, var(--bg-mid) 52%, #070d1f 100%);
+      color: var(--text-main);
+      font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Слой падающих лепестков сакуры */
+    .sakura-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .petal {
+      position: absolute;
+      top: -40px;
+      opacity: 0;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 0 6px rgba(255, 158, 196, 0.35));
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translate3d(0, -10vh, 0) rotate(0deg) scale(var(--scale, 1));
+        opacity: 0;
+      }
+      12% {
+        opacity: var(--alpha, 0.85);
+      }
+      50% {
+        transform: translate3d(var(--sway, 36px), 48vh, 0) rotate(185deg) scale(var(--scale, 1));
+      }
+      88% {
+        opacity: var(--alpha, 0.85);
+      }
+      100% {
+        transform: translate3d(calc(var(--sway, 36px) * -0.4), 108vh, 0) rotate(360deg) scale(var(--scale, 1));
+        opacity: 0;
+      }
+    }
+
+    /* Основной контейнер */
+    .app-wrapper {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      padding: 22px 16px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: 26px;
+      padding: 24px 20px;
+      box-shadow:
+        0 24px 60px rgba(2, 5, 15, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 158, 196, 0.12);
+      border: 1px solid rgba(255, 158, 196, 0.28);
+      color: var(--sakura-soft);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--sakura);
+      box-shadow: 0 0 10px var(--sakura);
+    }
+
+    h1 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 34px;
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      color: var(--sakura);
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* Теги-рубрики */
+    .tags-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tag-btn {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 14px;
+      padding: 7px 12px;
+      font-family: "Manrope", sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tag-btn.active {
+      background: linear-gradient(135deg, rgba(255, 158, 196, 0.24), rgba(143, 178, 255, 0.18));
+      border-color: rgba(255, 158, 196, 0.65);
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(255, 158, 196, 0.16);
+    }
+
+    /* Поле ввода */
+    .input-box {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 155px;
+      padding: 15px 15px 34px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(5, 10, 24, 0.65);
+      color: var(--text-main);
+      font-family: "Manrope", sans-serif;
+      font-size: 14.5px;
+      line-height: 1.55;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    textarea::placeholder {
+      color: rgba(159, 176, 214, 0.55);
+    }
+
+    textarea:focus {
+      border-color: var(--sakura);
+      box-shadow: 0 0 0 3px rgba(255, 158, 196, 0.16);
+    }
+
+    .counter {
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .counter.warn {
+      color: var(--sakura);
+    }
+
+    /* Переключатель подписи */
+    .anon-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(243, 210, 153, 0.28);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .anon-note strong {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* Кнопка отправки */
+    .submit-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ff8ab8 0%, #e56b9e 55%, #b57cff 100%);
+      color: #090d1a;
+      font-family: "Manrope", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(255, 138, 184, 0.28);
+      transition: transform 0.16s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .toast {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12.5px;
+      min-height: 18px;
+      color: var(--sakura-soft);
+    }
+  </style>
+</head>
+<body>
+  <!-- Падающие лепестки сакуры -->
+  <div class="sakura-layer" id="sakuraLayer" aria-hidden="true"></div>
+
+  <main class="app-wrapper">
+    <section class="card">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>100% АНОНИМНО • МОДЕРАЦИЯ</span>
+      </div>
+
+      <h1>KHNEU <span>GOSSIP</span></h1>
+      <p class="subtitle">
+        Оставь историю, признание или горячую сплетню с пар и коридоров. Имя и аккаунт не публикуются.
+      </p>
+
+      <div class="tags-label">Выбери настроение поста</div>
+      <div class="tags" id="tags">
+        <button type="button" class="tag-btn active" data-tag="Сплетня">💬 Сплетня</button>
+        <button type="button" class="tag-btn" data-tag="Признание">🌙 Признание</button>
+        <button type="button" class="tag-btn" data-tag="Кринж на паре">😅 Кринж на паре</button>
+        <button type="button" class="tag-btn" data-tag="Вопрос">✨ Вопрос</button>
+      </div>
+
+      <div class="input-box">
+        <textarea
+          id="messageInput"
+          maxlength="1200"
+          placeholder="Расскажи, что случилось сегодня..."
+        ></textarea>
+        <div class="counter" id="counter">0 / 1200</div>
+      </div>
+
+      <div class="anon-note">
+        <span>🌸 После проверки пост уйдет в ленту от имени бота</span>
+        <strong>Без имени</strong>
+      </div>
+
+      <button type="button" class="submit-btn" id="submitBtn">Отправить анонимно</button>
+      <div class="toast" id="toast"></div>
+    </section>
+  </main>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (typeof tg.setHeaderColor === "function") {
+        tg.setHeaderColor("#060b19");
+      }
+      if (typeof tg.setBackgroundColor === "function") {
+        tg.setBackgroundColor("#060b19");
+      }
+    }
+
+    // Генерация лепестков сакуры
+    const sakuraLayer = document.getElementById("sakuraLayer");
+    const petalCount = 24;
+
+    const petalSVG = `
+      <svg viewBox="0 0 32 32" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 3C11.5 8.5 6 12.5 6 19.5C6 24.8 10.5 28.5 16 29C21.5 28.5 26 24.8 26 19.5C26 12.5 20.5 8.5 16 3Z"
+              fill="url(#grad)"/>
+        <path d="M16 5V27" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="grad" x1="6" y1="3" x2="26" y2="29" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffe0ec"/>
+            <stop offset="55%" stop-color="#ff9ec4"/>
+            <stop offset="100%" stop-color="#f274a6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    `;
+
+    for (let i = 0; i < petalCount; i++) {
+      const petal = document.createElement("div");
+      petal.className = "petal";
+      petal.innerHTML = petalSVG;
+
+      const left = Math.random() * 100;
+      const duration = 7 + Math.random() * 7;
+      const delay = -(Math.random() * 10);
+      const scale = (0.65 + Math.random() * 0.65).toFixed(2);
+      const alpha = (0.55 + Math.random() * 0.4).toFixed(2);
+      const sway = `${(Math.random() > 0.5 ? 1 : -1) * (24 + Math.random() * 38)}px`;
+
+      petal.style.left = `${left}%`;
+      petal.style.animationDuration = `${duration}s`;
+      petal.style.animationDelay = `${delay}s`;
+      petal.style.setProperty("--scale", scale);
+      petal.style.setProperty("--alpha", alpha);
+      petal.style.setProperty("--sway", sway);
+
+      sakuraLayer.appendChild(petal);
+    }
+
+    // Выбор тега
+    let selectedTag = "Сплетня";
+    const tagButtons = document.querySelectorAll(".tag-btn");
+    tagButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tagButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedTag = btn.dataset.tag;
+      });
+    });
+
+    // Счетчик символов
+    const textarea = document.getElementById("messageInput");
+    const counter = document.getElementById("counter");
+    const submitBtn = document.getElementById("submitBtn");
+    const toast = document.getElementById("toast");
+
+    textarea.addEventListener("input", () => {
+      const len = textarea.value.length;
+      counter.textContent = `${len} / 1200`;
+      counter.classList.toggle("warn", len > 1050);
+      toast.textContent = "";
+    });
+
+    // Отправка в Telegram-бот
+    submitBtn.addEventListener("click", () => {
+      const text = textarea.value.trim();
+      if (!text) {
+        toast.textContent = "Напиши хоть пару слов перед отправкой ✨";
+        textarea.focus();
+        return;
+      }
+
+      const payload = JSON.stringify({
+        tag: selectedTag,
+        text: text
+      });
+
+      if (tg && typeof tg.sendData === "function") {
+        submitBtn.disabled = true;
+        tg.sendData(payload);
+        tg.close();
+      } else {
+        // Проверка в обычном браузере вне Telegram
+        toast.textContent = `Готово к отправке [${selectedTag}]: "${text.slice(0, 40)}${text.length > 40 ? "..." : ""}"`;
+      }
+    });
+  </script>
+</body>
+</html>
